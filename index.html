@@ -31,7 +31,7 @@
 								<div>
 									<div class="row">
 										<div class="col-6 col-12-medium">
-											<input id="scanner_input" type="text" name="name" placeholder="Name" />
+											<input id="scanner_input" onclick="escaneo()" type="text" name="name" placeholder="Name" />
 										</div>
 										<div class="col-12">
 											<input type="submit" value="Enviar" />
@@ -51,7 +51,10 @@
 								<div>
 									<div class="row">
 										<div class="col-6 col-12-medium">
+
+											<div id="reader" width="600px"></div>
 											<input type="text" name="name" placeholder="Name" />
+
 										</div>
 										<div class="col-12">
 											<input type="submit" value="Enviar" />
@@ -88,26 +91,30 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+
+		<script src="assets/scanapp.min.js"></script>
 		<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 		<script>
-			let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+			function lecturaCorrecta(decodedText, decodedResult) {
+				// handle the scanned code as you like, for example:
+				console.log(`Code matched = ${decodedText}`, decodedResult);
+			}
 
-			scanner.addListener('scan', function (content) {
-				console.log(content);
-				document.getElementById('scanner_input').value = content;
-			});
+			function errorLectura(error) {
+				// handle scan failure, usually better to ignore and keep scanning.
+				// for example:
+				console.warn(`Code scan error = ${error}`);
+			}
 
-			document.getElementById('scanner_input').addEventListener('click', function(){
-				Instascan.Camera.getCameras().then(function (cameras) {
-					if (cameras.length > 0) {
-						scanner.start(cameras[0]);
-					} else {
-						console.error('No cameras found.');
-					}
-				}).catch(function (e) {
-					console.error(e);
-				});
-			});
+			function escaneo() {
+
+				let html5QrcodeScanner = new Html5QrcodeScanner(
+						"reader",
+						{ fps: 10, qrbox: {width: 250, height: 250} },
+						/* verbose= */ false);
+
+				html5QrcodeScanner.render(lecturaCorrecta, errorLectura);
+			}
 		</script>
 	</body>
 </html>
