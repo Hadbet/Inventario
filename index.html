@@ -31,6 +31,8 @@
 								<div>
 									<div class="row">
 										<div class="col-6 col-12-medium">
+
+											<div id="reader" width="600px"></div>
 											<input id="scanner_input" onclick="escaneo()" type="text" name="name" placeholder="Name" />
 										</div>
 										<div class="col-12">
@@ -52,10 +54,10 @@
 									<div class="row">
 										<div class="col-6 col-12-medium">
 
-											<div id="reader" width="600px"></div>
 											<input type="text" name="name" placeholder="Name" />
 
 										</div>
+
 										<div class="col-12">
 											<input type="submit" value="Enviar" />
 										</div>
@@ -98,6 +100,7 @@
 			function lecturaCorrecta(decodedText, decodedResult) {
 				// handle the scanned code as you like, for example:
 				console.log(`Code matched = ${decodedText}`, decodedResult);
+				document.getElementById("scanner_input").value = decodedText;
 			}
 
 			function errorLectura(error) {
