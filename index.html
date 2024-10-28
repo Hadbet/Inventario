@@ -87,35 +87,22 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-			<script src="https://cdn.rawgit.com/serratus/quaggaJS/0420d8e0/dist/quagga.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/barcode-reader@1.0.0/dist/BarcodeReader.min.js"></script>
 
-	<script>
-		document.getElementById('scanner_input').addEventListener('click', function(){
-			Quagga.init({
-				inputStream: {
-					type : "LiveStream",
-					constraints: {
-						width: {min: 640},
-						height: {min: 480},
-						facingMode: "environment",
-						aspectRatio: {min: 1, max: 2}
+		<script>
+			document.getElementById('scanner_input').addEventListener('click', function(){
+				BarcodeReader.Init();
+				BarcodeReader.SetImageCallback(function(result) {
+					if(result.length > 0){
+						var tempArray = [];
+						for(var i = 0; i < result.length; i++){
+							tempArray.push(result[i].Format+" : "+result[i].Value);
+						}
+						document.getElementById('scanner_input').value = tempArray.join("\n");
 					}
-				},
-				decoder: {
-					readers : ["code_128_reader"]
-				}
-			}, function(err) {
-				if (err) {
-					console.log(err);
-					return
-				}
-				Quagga.start();
+				});
+				BarcodeReader.DecodeStream();
 			});
-
-			Quagga.onDetected(function(result) {
-				document.getElementById('scanner_input').value = result.codeResult.code;
-			});
-		});
-	</script>
+		</script>
 	</body>
 </html>
