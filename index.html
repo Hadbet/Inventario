@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Astral by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 	<head>
 		<title>Inventario</title>
@@ -28,23 +23,23 @@
 					<div id="main">
 
 						<!-- Me -->
-							<article id="home" class="panel">
-								<header>
-									<h1>Escanea marbete para empezar</h1>
-								</header>
-								<form action="#" method="post">
-									<div>
-										<div class="row">
-											<div class="col-6 col-12-medium">
-												<input type="text" name="name" placeholder="Name" />
-											</div>
-											<div class="col-12">
-												<input type="submit" value="Enviar" />
-											</div>
+						<article id="home" class="panel">
+							<header>
+								<h1>Escanea marbete para empezar</h1>
+							</header>
+							<form action="#" method="post">
+								<div>
+									<div class="row">
+										<div class="col-6 col-12-medium">
+											<input id="scanner_input" type="text" name="name" placeholder="Name" />
+										</div>
+										<div class="col-12">
+											<input type="submit" value="Enviar" />
 										</div>
 									</div>
-								</form>
-							</article>
+								</div>
+							</form>
+						</article>
 
 						<!-- Work -->
 						<article id="work" class="panel">
@@ -92,6 +87,35 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script src="https://cdn.rawgit.com/serratus/quaggaJS/0420d8e0/dist/quagga.min.js"></script>
 
+	<script>
+		document.getElementById('scanner_input').addEventListener('click', function(){
+			Quagga.init({
+				inputStream: {
+					type : "LiveStream",
+					constraints: {
+						width: {min: 640},
+						height: {min: 480},
+						facingMode: "environment",
+						aspectRatio: {min: 1, max: 2}
+					}
+				},
+				decoder: {
+					readers : ["code_128_reader"]
+				}
+			}, function(err) {
+				if (err) {
+					console.log(err);
+					return
+				}
+				Quagga.start();
+			});
+
+			Quagga.onDetected(function(result) {
+				document.getElementById('scanner_input').value = result.codeResult.code;
+			});
+		});
+	</script>
 	</body>
 </html>
