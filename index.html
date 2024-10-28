@@ -39,6 +39,7 @@
 									</div>
 								</div>
 							</form>
+							<video id="preview"></video> <!-- Añade esto -->
 						</article>
 
 						<!-- Work -->
@@ -87,21 +88,25 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/barcode-reader@1.0.0/dist/BarcodeReader.min.js"></script>
-
+		<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 		<script>
+			let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+
+			scanner.addListener('scan', function (content) {
+				console.log(content);
+				document.getElementById('scanner_input').value = content;
+			});
+
 			document.getElementById('scanner_input').addEventListener('click', function(){
-				BarcodeReader.Init();
-				BarcodeReader.SetImageCallback(function(result) {
-					if(result.length > 0){
-						var tempArray = [];
-						for(var i = 0; i < result.length; i++){
-							tempArray.push(result[i].Format+" : "+result[i].Value);
-						}
-						document.getElementById('scanner_input').value = tempArray.join("\n");
+				Instascan.Camera.getCameras().then(function (cameras) {
+					if (cameras.length > 0) {
+						scanner.start(cameras[0]);
+					} else {
+						console.error('No cameras found.');
 					}
+				}).catch(function (e) {
+					console.error(e);
 				});
-				BarcodeReader.DecodeStream();
 			});
 		</script>
 	</body>
