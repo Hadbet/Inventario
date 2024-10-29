@@ -36,7 +36,7 @@
 											<input id="scanner_input" onclick="escaneo()" type="text" name="name" placeholder="Name" />
 										</div>
 										<div class="col-12">
-											<input type="submit" value="Enviar" />
+											<input type="submit" value="Comenzar" />
 										</div>
 									</div>
 								</div>
@@ -47,7 +47,9 @@
 						<!-- Work -->
 						<article id="work" class="panel">
 							<header>
-								<h2>Escanea el Storage Bin</h2>
+								<h2 id="lblNumeroParte"></h2>
+								<h2 id="lblStorageBin"></h2>
+								<h2>Escanea el Storage Unit</h2>
 							</header>
 							<form action="#" method="post">
 								<div>
@@ -97,25 +99,44 @@
 		<script src="assets/scanapp.min.js"></script>
 		<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 		<script>
+
+			let html5QrcodeScanner;
+			var numeroParte;
+			var storageBin;
 			function lecturaCorrecta(decodedText, decodedResult) {
-				// handle the scanned code as you like, for example:
-				console.log(`Code matched = ${decodedText}`, decodedResult);
-				document.getElementById("scanner_input").value = decodedText;
+				var marbete = decodedText.split('.')[0];
+				$.getJSON('https://grammermx.com/Inventario/dao/consultaMarbete.php?marbete='+marbete, function (data) {
+					for (var i = 0; i < data.data.length; i++) {
+						if (data.data[i].Id_Marbete) { // Verifica si Id_Marbete existe
+							numeroParte=data.data[i].Numero_Parte;
+							storageBin=data.data[i].StorageBin;
+							console.log(`Code matched = ${decodedText}`, decodedResult);
+							document.getElementById("scanner_input").value = decodedText;
+							document.getElementById("reader").style.display = 'none';
+							document.getElementById("lblNumeroParte").innerText = numeroParte;
+							document.getElementById("lblStorageBin").innerText = storageBin;
+							html5QrcodeScanner.clear();
+							html5QrcodeScanner.pause();
+							window.location.hash = "work";
+						} else {
+							alert('Id_Marbete no existe en el objeto data');
+						}
+					}
+				});
+
+
 			}
 
 			function errorLectura(error) {
-				// handle scan failure, usually better to ignore and keep scanning.
-				// for example:
 				console.warn(`Code scan error = ${error}`);
 			}
 
 			function escaneo() {
-
-				let html5QrcodeScanner = new Html5QrcodeScanner(
+				html5QrcodeScanner = new Html5QrcodeScanner(
 						"reader",
 						{ fps: 10, qrbox: {width: 250, height: 250} },
 						/* verbose= */ false);
-
+				document.getElementById("reader").style.display = 'block';
 				html5QrcodeScanner.render(lecturaCorrecta, errorLectura);
 			}
 		</script>
