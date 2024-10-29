@@ -33,7 +33,7 @@
 										<div class="col-6 col-12-medium">
 
 											<div id="reader" width="600px"></div>
-											<input id="scanner_input" onclick="escaneo()" type="text" name="name" placeholder="Name" />
+											<input id="scanner_input" onclick="escaneo()" type="text" name="name" placeholder="Folio marbete" />
 										</div>
 										<div class="col-12">
 											<input type="submit" value="Comenzar" />
@@ -49,14 +49,15 @@
 							<header>
 								<h2 id="lblNumeroParte"></h2>
 								<h2 id="lblStorageBin"></h2>
+								<br>
 								<h2>Escanea el Storage Unit</h2>
 							</header>
 							<form action="#" method="post">
 								<div>
 									<div class="row">
 										<div class="col-6 col-12-medium">
-
-											<input type="text" name="name" placeholder="Name" />
+											<div id="readerDos" width="600px"></div>
+											<input type="text" onclick="escaneoUnit()" id="txtStorageUnit" name="name" placeholder="Storage Unit" />
 
 										</div>
 
@@ -74,7 +75,17 @@
 									<h2>Verifica la informacion</h2>
 								</header>
 								<table>
-									
+									<table id="data-table">
+										<thead>
+										<tr>
+											<th>Número de parte</th>
+											<th>Cantidad</th>
+										</tr>
+										</thead>
+										<tbody>
+										<!-- Los datos se agregarán aquí -->
+										</tbody>
+									</table>
 								</table>
 							</article>
 
@@ -101,8 +112,12 @@
 		<script>
 
 			let html5QrcodeScanner;
+			let html5QrcodeScannerUnit;
 			var numeroParte;
 			var storageBin;
+
+			var numeroParteUnit;
+			var cantidad;
 			function lecturaCorrecta(decodedText, decodedResult) {
 				var marbete = decodedText.split('.')[0];
 				$.getJSON('https://grammermx.com/Inventario/dao/consultaMarbete.php?marbete='+marbete, function (data) {
@@ -138,6 +153,47 @@
 						/* verbose= */ false);
 				document.getElementById("reader").style.display = 'block';
 				html5QrcodeScanner.render(lecturaCorrecta, errorLectura);
+			}
+
+			function lecturaCorrectaUnit(decodedText, decodedResult) {
+				$.getJSON('https://grammermx.com/Inventario/dao/consultaStorageUnit.php?storageUnit='+decodedText, function (data) {
+					for (var i = 0; i < data.data.length; i++) {
+						if (data.data[i].Id_StorageUnit) { // Verifica si Id_Marbete existe
+							numeroParteUnit=data.data[i].Numero_Parte;
+							cantidad=data.data[i].Cantidad;
+							console.log(`Code matched = ${decodedText}`, decodedResult);
+							document.getElementById("txtStorageUnit").value = decodedText;
+							document.getElementById("readerDos").style.display = 'none';
+
+							var table = document.getElementById("data-table");
+							var row = table.insertRow(-1); // Crea una nueva fila al final de la tabla
+							var cell1 = row.insertCell(0); // Crea una nueva celda en la fila
+							var cell2 = row.insertCell(1); // Crea otra nueva celda en la fila
+							cell1.innerHTML = numeroParteUnit; // Agrega el número de parte a la primera celda
+							cell2.innerHTML = cantidad; // Agrega la cantidad a la segunda celda
+
+							html5QrcodeScanner.clear();
+							html5QrcodeScanner.pause();
+						} else {
+							alert('Id_Marbete no existe en el objeto data');
+						}
+					}
+				});
+
+
+			}
+
+			function errorLecturaUnit(error) {
+				console.warn(`Code scan error = ${error}`);
+			}
+
+			function escaneoUnit() {
+				html5QrcodeScannerUnit = new Html5QrcodeScanner(
+						"readerDos",
+						{ fps: 10, qrbox: {width: 250, height: 250} },
+						/* verbose= */ false);
+				document.getElementById("readerDos").style.display = 'block';
+				html5QrcodeScannerUnit.render(lecturaCorrectaUnit, errorLecturaUnit);
 			}
 		</script>
 	</body>
