@@ -62,7 +62,7 @@
 										</div>
 
 										<div class="col-12">
-											<input type="submit" value="Enviar" />
+											<input type="submit" value="Finalizar Captura" />
 										</div>
 									</div>
 								</div>
@@ -109,6 +109,7 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 		<script src="assets/scanapp.min.js"></script>
 		<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
@@ -121,11 +122,14 @@
 
 			var numeroParteUnit;
 			var cantidad;
+
 			function lecturaCorrecta(decodedText, decodedResult) {
+
 				var marbete = decodedText.split('.')[0];
+
 				$.getJSON('https://grammermx.com/Inventario/dao/consultaMarbete.php?marbete='+marbete, function (data) {
 					for (var i = 0; i < data.data.length; i++) {
-						if (data.data[i].Id_Marbete) { // Verifica si Id_Marbete existe
+						if (data.data[i].Id_Marbete) {
 							numeroParte=data.data[i].Numero_Parte;
 							storageBin=data.data[i].StorageBin;
 							console.log(`Code matched = ${decodedText}`, decodedResult);
@@ -142,7 +146,6 @@
 					}
 				});
 
-
 			}
 
 			function errorLectura(error) {
@@ -158,32 +161,55 @@
 				html5QrcodeScanner.render(lecturaCorrecta, errorLectura);
 			}
 
+			var addedStorageUnits = {};
+
 			function lecturaCorrectaUnit(decodedText, decodedResult) {
 				$.getJSON('https://grammermx.com/Inventario/dao/consultaStorageUnit.php?storageUnit='+decodedText, function (data) {
 					for (var i = 0; i < data.data.length; i++) {
-						if (data.data[i].Id_StorageUnit) { // Verifica si Id_Marbete existe
+						if (data.data[i].Id_StorageUnit) {
+							if (addedStorageUnits[data.data[i].Id_StorageUnit]) {
+								return;
+							}
+
+							addedStorageUnits[data.data[i].Id_StorageUnit] = true;
+
 							numeroParteUnit=data.data[i].Numero_Parte;
-							cantidad=data.data[i].Cantidad;
-							console.log(`Code matched = ${decodedText}`, decodedResult);
-							document.getElementById("txtStorageUnit").value = decodedText;
-							document.getElementById("readerDos").style.display = 'none';
+							if (numeroParteUnit===numeroParte){
+								cantidad=data.data[i].Cantidad;
+								console.log(`Code matched = ${decodedText}`, decodedResult);
+								document.getElementById("txtStorageUnit").value = decodedText;
+								//document.getElementById("readerDos").style.display = 'none';
 
-							var table = document.getElementById("data-table");
-							var row = table.insertRow(-1); // Crea una nueva fila al final de la tabla
-							var cell1 = row.insertCell(0); // Crea una nueva celda en la fila
-							var cell2 = row.insertCell(1); // Crea otra nueva celda en la fila
-							cell1.innerHTML = numeroParteUnit; // Agrega el número de parte a la primera celda
-							cell2.innerHTML = cantidad; // Agrega la cantidad a la segunda celda
+								var table = document.getElementById("data-table");
+								var row = table.insertRow(-1); // Crea una nueva fila al final de la tabla
+								var cell1 = row.insertCell(0); // Crea una nueva celda en la fila
+								var cell2 = row.insertCell(1); // Crea otra nueva celda en la fila
+								cell1.innerHTML = numeroParteUnit; // Agrega el número de parte a la primera celda
+								cell2.innerHTML = cantidad; // Agrega la cantidad a la segunda celda
 
-							html5QrcodeScannerUnit.clear();
-							html5QrcodeScannerUnit.pause();
+								//html5QrcodeScannerUnit.clear();
+								//html5QrcodeScannerUnit.pause();
+								Swal.fire({
+									title: "Storage unit escaneado",
+									text: "Unit : "+data.data[i].Id_StorageUnit,
+									icon: "success"
+								});
+							} else {
+								Swal.fire({
+									title: "El número de parte no corresponde",
+									text: "Escanea el storage unit correcto",
+									icon: "error"
+								});
+							}
 						} else {
-							alert('Id_Marbete no existe en el objeto data');
+							Swal.fire({
+								title: "El storage unit no es correcto",
+								text: "Escanea el storage unit correcto",
+								icon: "error"
+							});
 						}
 					}
 				});
-
-
 			}
 
 			function errorLecturaUnit(error) {
@@ -197,6 +223,20 @@
 						/* verbose= */ false);
 				document.getElementById("readerDos").style.display = 'block';
 				html5QrcodeScannerUnit.render(lecturaCorrectaUnit, errorLecturaUnit);
+			}
+
+			function getTableData() {
+				var table = document.getElementById("data-table");
+				var data = [];
+				for (var i = 1; i < table.rows.length; i++) { // Comienza en 1 para ignorar la fila de encabezado
+					var row = table.rows[i];
+					var rowData = {
+						"NumeroParte": row.cells[0].innerText,
+						"Cantidad": row.cells[1].innerText
+					};
+					data.push(rowData);
+				}
+				return data;
 			}
 		</script>
 	</body>
