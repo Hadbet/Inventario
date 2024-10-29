@@ -117,7 +117,7 @@
 							document.getElementById("lblStorageBin").innerText = storageBin;
 							html5QrcodeScanner.clear();
 							html5QrcodeScanner.pause();
-							window.location.hash = "work";
+							document.getElementById("work").scrollIntoView();
 						} else {
 							alert('Id_Marbete no existe en el objeto data');
 						}
