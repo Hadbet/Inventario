@@ -113,11 +113,11 @@
 							console.log(`Code matched = ${decodedText}`, decodedResult);
 							document.getElementById("scanner_input").value = decodedText;
 							document.getElementById("reader").style.display = 'none';
-							document.getElementById("lblNumeroParte").innerText = numeroParte;
-							document.getElementById("lblStorageBin").innerText = storageBin;
+							document.getElementById("lblNumeroParte").innerText = "Número de parte : "+numeroParte;
+							document.getElementById("lblStorageBin").innerText = "Ubicación : "+storageBin;
+							window.location.hash = "work";
 							html5QrcodeScanner.clear();
 							html5QrcodeScanner.pause();
-							document.getElementById("work").scrollIntoView();
 						} else {
 							alert('Id_Marbete no existe en el objeto data');
 						}
