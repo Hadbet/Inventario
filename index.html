@@ -67,6 +67,21 @@
 									</div>
 								</div>
 							</form>
+
+							<table>
+								<table id="data-table">
+									<thead>
+									<tr>
+										<th>Número de parte</th>
+										<th>Cantidad</th>
+									</tr>
+									</thead>
+									<tbody>
+									<!-- Los datos se agregarán aquí -->
+									</tbody>
+								</table>
+							</table>
+
 						</article>
 
 						<!-- Contact -->
@@ -74,19 +89,7 @@
 								<header>
 									<h2>Verifica la informacion</h2>
 								</header>
-								<table>
-									<table id="data-table">
-										<thead>
-										<tr>
-											<th>Número de parte</th>
-											<th>Cantidad</th>
-										</tr>
-										</thead>
-										<tbody>
-										<!-- Los datos se agregarán aquí -->
-										</tbody>
-									</table>
-								</table>
+
 							</article>
 
 					</div>
@@ -172,8 +175,8 @@
 							cell1.innerHTML = numeroParteUnit; // Agrega el número de parte a la primera celda
 							cell2.innerHTML = cantidad; // Agrega la cantidad a la segunda celda
 
-							html5QrcodeScanner.clear();
-							html5QrcodeScanner.pause();
+							html5QrcodeScannerUnit.clear();
+							html5QrcodeScannerUnit.pause();
 						} else {
 							alert('Id_Marbete no existe en el objeto data');
 						}
